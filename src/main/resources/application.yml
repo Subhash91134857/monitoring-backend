@@ -1,0 +1,165 @@
+spring:
+  application:
+    name: api-monitoring-platform
+
+  # Database Connection Configuration
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/monitoring_db}
+    username: ${DB_USERNAME:postrgres}
+    password: ${DB_PASSWORD:Subhash}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # ORM / Hibernate Strategy
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+        format_sql: true
+    show-sql: false
+
+  # Distributed Cache Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  # Native Mail Configuration (Consolidated here so Spring Boot auto-wires JavaMailSender)
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:monitoring@company.com}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  # Native Thymeleaf Configuration (Moved to standard root prefix)
+  thymeleaf:
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+
+  # JSON Serialization Configuration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+
+# Embedded Web Server Configurations
+server:
+  port: ${PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    connection-timeout: 20000
+
+# CUSTOM APPLICATION PROPERTIES
+app:
+  jwt:
+    secret: ${JWT_SECRET:5367566B59703373367639792442264529482B4D6251655468576D5A71347437}
+    expiration: 3600000  # 1 hour
+    refresh-expiration: 86400000  # 24 hours
+    security:
+      bcrypt-strength: 10
+    default:
+      role: VIEWER
+      admin:
+        email: admin@monitoring.com
+        password: Admin@123
+        username: admin
+
+  monitoring:
+    thread-pool:
+      core-size: 20
+      max-size: 50
+      queue-capacity: 100
+      keep-alive-seconds: 60
+    scheduler:
+      fixed-rate: 60000 # 1 minute
+      initial-delay: 5000
+
+  incident:
+    auto-resolve:
+      enabled: true
+      minutes-after-recovery: 5
+    escalation:
+      enabled: true
+      after-minutes: 15
+    reminder:
+      enabled: true
+      every-minutes: 30
+
+  notification:
+      email:
+        enabled: true
+        from: ${NOTIFICATION_EMAIL:monitoring@company.com}
+        from-name: "API Monitoring Platform"
+        reply-to: ${REPLY_TO_EMAIL:support@company.com}
+
+      slack:
+        enabled: ${SLACK_ENABLED:false}
+        webhook-url: ${SLACK_WEBHOOK_URL:}
+        channel: ${SLACK_CHANNEL:#alerts}
+        bot-token: ${SLACK_BOT_TOKEN:}
+
+      webhook:
+        enabled: true
+        retry-count: 3
+        timeout: 10000
+
+      sms:
+        enabled: ${SMS_ENABLED:false}
+        account-sid: ${TWILIO_ACCOUNT_SID:}
+        auth-token: ${TWILIO_AUTH_TOKEN:}
+        from-number: ${TWILIO_FROM_NUMBER:}
+        to-number: ${ALERT_PHONE_NUMBER:}
+
+      websocket:
+        enabled: true
+        endpoint: /ws/alerts
+        topic: /topic/alerts
+
+# Platform System Logs Diagnostics Configuration
+logging:
+  level:
+    root: INFO
+    com.monitoring: DEBUG
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/monitoring-platform.log
+    max-size: 10MB
+    max-history: 30

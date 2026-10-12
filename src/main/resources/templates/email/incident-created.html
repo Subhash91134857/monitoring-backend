@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Incident Created</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f8f9fa;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .severity-critical {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .severity-high {
+            color: #fd7e14;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🚨 Incident Created</h1>
+    </div>
+
+    <div class="content">
+        <h2>Incident Details</h2>
+        <p><strong>Incident Number:</strong> <span th:text="${incidentNumber}"></span></p>
+        <p><strong>Status:</strong> <span th:text="${incident.status.displayName}"></span></p>
+        <p><strong>Severity:</strong>
+            <span th:class="'severity-' + ${incident.severity.name().toLowerCase()}"
+                  th:text="${incident.severity.displayName}"></span>
+        </p>
+        <p><strong>API:</strong> <span th:text="${apiName}"></span></p>
+        <p><strong>Started:</strong> <span th:text="${incident.startedAt}"></span></p>
+        <p><strong>Description:</strong></p>
+        <p th:text="${incident.description}"></p>
+
+        <a th:href="${dashboardUrl}" class="button">View in Dashboard</a>
+    </div>
+
+    <div class="footer">
+        <p>This is an automated message from API Monitoring Platform.</p>
+        <p>&copy; 2024 API Monitoring Platform</p>
+    </div>
+</div>
+</body>
+</html>
